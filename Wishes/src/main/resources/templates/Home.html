@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+
+<style>
+img{
+	width:200px;
+	height:200px;
+}
+</style>
+</head>
+<body>
+ 	 Welcome
+ 	 <a href="/logout"> logout </a>
+ 	 
+ 	 <h1>Upload a link</h1>
+
+	
+	<form action="link" method='POST' >
+		<table>
+		<tr>
+		<td>Amazon Link:</td>
+		<td><input type="url" name="link"> <br></td>
+		</tr>
+		<tr>
+		<td><input name="submit" type="submit" value="submit"> <br></td>
+		</tr>
+		</table>
+		</form>
+		<div class="Images" >
+		<!-- <img th:src = "@{${'/photos/' + Contentimages.link}" alt = ""/>-->
+		<table>
+		 <tr th:each="Content : ${contentImages}">
+        	<td th:text="${Content.key}">Key</td>
+        	<td><img th:src = "@{${'/photos/' +Content.value.imgpath}}" alt = "Image Did not Load Try Again Later"/></td>
+        	</tr>
+        </table>
+   
+		</div>
+		
+		<!-- <table>
+       		<tr th:each="anews : ${Content.value}">
+       		<tr th:each="nkey : ${anews.key}">
+       		<td> <img th:src = "@{${'/photos/' + nkey.imgPath}" alt = ""/></td>
+       		  </tr> -->
+		
+		
+		
+ 	 
+ 	 
+ 	 
+ 	 
+ 	 
+ 	 
+ 	 
+ 	 
+ 	 
+ 	 
+ 	 
+</body>
+</html>
