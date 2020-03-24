@@ -1,20 +1,15 @@
 package com.abo.demo.webparse;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import javax.imageio.ImageIO;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,8 +17,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.abo.demo.usersecure.UserRepository;
 
 
 @Component
@@ -35,8 +28,8 @@ public class JsoupDownloadImages {
 	
 	
 	    //private static String IMAGE_DESTINATION_FOLDER = "\\src\\main\\resources\\static\\photos";
-	    
-	    public String ParseLink(String link, int uid, String imgT) throws IOException {
+	    //Parses The Website and pulls items
+	    public String ParseLink(String link, String Cid, String imgT) throws IOException {
 	        
 	        //replace it with your URL 
 	        String strURL = link;
@@ -59,13 +52,13 @@ public class JsoupDownloadImages {
 	            
 	            //download image one by one
 	            
-	            return(downloadImage(strImageURL,uid, imgT));
+	            return(downloadImage(strImageURL,Cid, imgT));
 	            
 	        }
 	        return "notsaved";
 	    }
 	    
-	    public  String downloadImage(String strImageURL,int uid ,String imgT){
+	    public  String downloadImage(String strImageURL,String cid ,String imgT){
 	        Path absolutePath=Paths.get(".");
 	        Path path = Paths.get(absolutePath+ "/src/main/resources/static/photos/");
 	        //get file name from image path
@@ -93,9 +86,11 @@ public class JsoupDownloadImages {
 	            while ( (n = in.read(buffer)) != -1 ){
 	                os.write(buffer, 0, n);
 	            }
+	            
+	            //saving image name to database
 	            Contentimages conimg= new Contentimages();
 	            conimg.setImgpath(strImageName+ "." +imgT);
-	            conimg.setUid(uid);
+	            conimg.setCid(cid);
 	            ImgRepo.save(conimg);
 	            //close the stream
 	            os.close();
@@ -134,7 +129,7 @@ public class JsoupDownloadImages {
 	    	// else handle failure here
 
 	    	// read in image
-	    	BufferedImage inputImage = ImageIO.read(pushUrlStream);
+	    	//BufferedImage inputImage = ImageIO.read(pushUrlStream);
 	    	return imageType;
 	    }
 	    

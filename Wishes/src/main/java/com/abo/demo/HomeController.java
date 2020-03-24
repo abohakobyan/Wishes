@@ -1,50 +1,38 @@
 package com.abo.demo;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.abo.demo.usersecure.*;
+import com.abo.demo.lists.Usercontent;
+import com.abo.demo.lists.UsercontentRepo;
+import com.abo.demo.usersecure.SignUpForm;
+import com.abo.demo.usersecure.UserPrinciple;
+import com.abo.demo.usersecure.UserRepository;
+import com.abo.demo.usersecure.users;
 import com.abo.demo.webparse.Contentimages;
 import com.abo.demo.webparse.ImagesRepo;
 import com.abo.demo.webparse.JsoupDownloadImages;
-
-import org.jsoup.*;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 
 @Controller
@@ -84,15 +72,24 @@ public class HomeController implements WebMvcConfigurer {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			UserPrinciple p = (UserPrinciple) authentication.getPrincipal();
 			int uid= p.getID();
-			List<Contentimages> imgs = imgrepo.findByUid(uid);
-			Map<String, Contentimages> modelImg = new HashMap<String,Contentimages>();
-			for (Contentimages i : imgs) modelImg.put(String.valueOf(i.getCid()),i);
+			List<Usercontent> lists = contrepo.findByUid(uid);
+			Map<String, Usercontent> modelLists = new HashMap<String,Usercontent>();
+			for (Usercontent i : lists) modelLists.put(String.valueOf(i.getCid()),i);
 			ModelAndView usC = new ModelAndView();
-			usC.addObject("contentImages", modelImg);
+			usC.addObject("contentLists", modelLists);
 			usC.setViewName("Home.html");
 			return usC;
 		}
 		
+		//Use for the listspage
+//		List<Contentimages> imgs = imgrepo.findByUid(uid);
+//		Map<String, Contentimages> modelImg = new HashMap<String,Contentimages>();
+//		for (Contentimages i : imgs) modelImg.put(String.valueOf(i.getCid()),i);
+//		ModelAndView usC = new ModelAndView();
+//		usC.addObject("contentImages", modelImg);
+//		usC.setViewName("Home.html");
+//		return usC;
+//		
 		@RequestMapping("/login")
 		public String loginPage() {
 			return "login.html";
@@ -122,52 +119,60 @@ public class HomeController implements WebMvcConfigurer {
 			return "form.html";
 			}
 	
-		@PostMapping("/link")
-		public ModelAndView submitLink(@ModelAttribute("link") String link) {
-					
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Date d = new Date();
-			
+		
+		
+		
+		
+		@PostMapping("/newlist")
+		public String submitLink(@ModelAttribute("listName") String listName) {
+				
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			UserPrinciple p = (UserPrinciple) authentication.getPrincipal();
 			int uid= p.getID();
 			
 			Usercontent cont = new Usercontent();
 			cont.setUid(uid);
-			cont.setCid(dateFormat.format(d).toString()+uid);
+			String uniqueID = UUID.randomUUID().toString();
+			cont.setListtitle(listName);
+			cont.setCid(uniqueID);
+			contrepo.save(cont);
+			return "redirect:/";
+		}
+		
+		
+		@GetMapping("/list")
+		public ModelAndView list(ModelAndView modelAndView,@ModelAttribute("Cid") String listID) {
+			List<Contentimages> imgs = imgrepo.findByCid(listID);
+			Map<String, Contentimages> modelImg = new HashMap<String,Contentimages>();
+			for (Contentimages i : imgs) modelImg.put(String.valueOf(i.getImg_id()),i);
+			//ModelAndView usC = new ModelAndView();
+			modelAndView.addObject("contentImages", modelImg);
+			modelAndView.setViewName("list.html");
+			modelAndView.addObject("listID", listID);
+			
+			return modelAndView;
+			
+		}
+		@PostMapping("/newItem")
+		public String submitItem(@ModelAttribute("listID") String listID,@ModelAttribute("imgLink") String imageLink ) {
 			String imgT =null;
 			try {
-				 imgT = jsDownload.guessImgType(link);
+				 imgT = jsDownload.guessImgType(imageLink);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			cont.setLink(jsDownload.downloadImage(link,uid, imgT));		
-			
-			contrepo.save(cont);
+			jsDownload.downloadImage(imageLink,listID, imgT);	
 			try {
 				TimeUnit.SECONDS.sleep(3);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			
-			
-			List<Contentimages> imgs = imgrepo.findByUid(uid);
-			Map<String, Contentimages> modelImg = new HashMap<String,Contentimages>();
-			for (Contentimages i : imgs) modelImg.put(String.valueOf(i.getCid()),i);
-			ModelAndView usC = new ModelAndView();
-			usC.addObject("contentImages", modelImg);
-			usC.setViewName("Home.html");
-
-				
-			return usC;
+			return "redirect:/list?Cid=" + listID;
+		
+		
 		}
-		
-		
-		
-		
 		
 		
 		@RequestMapping("/logout-success")

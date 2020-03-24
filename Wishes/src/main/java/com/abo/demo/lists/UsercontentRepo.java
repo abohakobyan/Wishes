@@ -1,4 +1,4 @@
-package com.abo.demo;
+package com.abo.demo.lists;
 
 import java.util.List;
 

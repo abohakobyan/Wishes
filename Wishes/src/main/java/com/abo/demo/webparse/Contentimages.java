@@ -10,29 +10,28 @@ public class Contentimages {
 	@Id
 	private int img_id;
 	private String imgpath;
-	private int uid;
-	
-	
-	
-	
-	public int getCid() {
+	private String cid;
+	public int getImg_id() {
 		return img_id;
 	}
-	public void setCid(int cid) {
-		this.img_id = cid;
+	public void setImg_id(int img_id) {
+		this.img_id = img_id;
 	}
-	public int getUid() {
-		return uid;
-	}
-	public void setUid(int uid) {
-		this.uid = uid;
-	}
-	
 	public String getImgpath() {
 		return imgpath;
 	}
 	public void setImgpath(String imgpath) {
 		this.imgpath = imgpath;
 	}
+	public String getCid() {
+		return cid;
+	}
+	public void setCid(String ccid) {
+		cid = ccid;
+	}
+	
+	
+	
+	
 	
 }
