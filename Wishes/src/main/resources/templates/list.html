@@ -3,18 +3,14 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Your List</title>
 
 <style>
 img{
-	width:200px;
+	width:300px;
 	height:200px;
 }
 </style>
-<script>
-
-</script>
-
 </head>
 <body>
  	 Welcome
@@ -23,12 +19,14 @@ img{
  	 <h1>Upload a link</h1>
 
 	
-	<form action="newlist" method='POST' >
+	<form action="newItem" method='POST' >
 		<table>
 		<tr>
-		<td>Create New List:</td>
-		<td><input type="text" name="listName"> <br></td>
-		</tr>
+		<td>ImageLink:</td>
+		<td><input type="url" name="imgLink"> <br></td>
+		<td><input type="hidden" name ="listID" th:value= "${modelAndView.model.listID}"></td>
+		
+		
 		<tr>
 		<td><input name="submit" type="submit" value="submit"> <br></td>
 		</tr>
@@ -37,10 +35,9 @@ img{
 		<div class="Images" >
 		<!-- <img th:src = "@{${'/photos/' + Contentimages.link}" alt = ""/>-->
 		<table>
-		 <tr th:each="Content : ${contentLists}" >
-        	<td><a th:href="@{${'/list?Cid=' + Content.key}}" >
-        	<img th:src = "@{${'/photos/listplaceholder.png'}}" alt = "Image Did not Load Try Again Later"/></a></td>
-        	<td th:text= "${Content.value.listtitle}">Title</td>
+		 <tr th:each="Content : ${contentImages}">
+        	<td th:text="${Content.key}">Key</td>
+        	<td><img th:src = "@{${'/photos/' +Content.value.imgpath}}" alt = "Image Did not Load Try Again Later"/></td>
         	</tr>
         </table>
    
