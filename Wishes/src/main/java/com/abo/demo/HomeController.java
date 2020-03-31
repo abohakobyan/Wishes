@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -34,7 +36,7 @@ import com.abo.demo.webparse.Contentimages;
 import com.abo.demo.webparse.ImagesRepo;
 import com.abo.demo.webparse.JsoupDownloadImages;
 
-
+import org.springframework.web.multipart.MultipartFile;;
 @Controller
 public class HomeController implements WebMvcConfigurer {
 
@@ -81,16 +83,8 @@ public class HomeController implements WebMvcConfigurer {
 			return usC;
 		}
 		
-		//Use for the listspage
-//		List<Contentimages> imgs = imgrepo.findByUid(uid);
-//		Map<String, Contentimages> modelImg = new HashMap<String,Contentimages>();
-//		for (Contentimages i : imgs) modelImg.put(String.valueOf(i.getCid()),i);
-//		ModelAndView usC = new ModelAndView();
-//		usC.addObject("contentImages", modelImg);
-//		usC.setViewName("Home.html");
-//		return usC;
-//		
-		@RequestMapping("/login")
+
+		@GetMapping("/login")
 		public String loginPage() {
 			return "login.html";
 		}
@@ -102,7 +96,7 @@ public class HomeController implements WebMvcConfigurer {
 		}
 		
 		@ModelAttribute("signupform")
-		   public SignUpForm createStudentModel() {	
+		public SignUpForm createStudentModel() {	
 		      return new SignUpForm();
 		}
 		
@@ -154,15 +148,24 @@ public class HomeController implements WebMvcConfigurer {
 			
 		}
 		@PostMapping("/newItem")
-		public String submitItem(@ModelAttribute("listID") String listID,@ModelAttribute("imgLink") String imageLink ) {
+		public String submitItem(@ModelAttribute("listID") String listID,@ModelAttribute("Contentimages") Contentimages imageLink,
+				@RequestParam("file") MultipartFile file) {
+			
 			String imgT =null;
-			try {
-				 imgT = jsDownload.guessImgType(imageLink);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(!imageLink.getImgpath().isEmpty()) {
+				try {
+				
+					imgT = jsDownload.guessImgType(imageLink.getImgpath());
+					} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					}
+				jsDownload.downloadImage(imageLink.getImgpath(),listID, imgT,imageLink.getTitle(),imageLink.getLink());	
+			}else if(!file.isEmpty()){
+				jsDownload.getImage(file,listID,imageLink.getTitle(),imageLink.getLink());	
+			}else {
+				jsDownload.downloadImage("itemplaceholder.png" ,listID, imgT,imageLink.getTitle(),imageLink.getLink());	
 			}
-			jsDownload.downloadImage(imageLink,listID, imgT);	
 			try {
 				TimeUnit.SECONDS.sleep(3);
 			} catch (InterruptedException e) {
@@ -173,6 +176,19 @@ public class HomeController implements WebMvcConfigurer {
 		
 		
 		}
+		@GetMapping("/deleteimg")
+		public String removeImg(@ModelAttribute("img_id") int img_id,@ModelAttribute("listID") String listID) {
+			imgrepo.deleteById(img_id);
+			return "redirect:/list?Cid=" + listID;
+		}
+		@GetMapping("/deletelist")
+		@Transactional
+		public String removeList(@ModelAttribute("listID") String listID) {
+			imgrepo.deleteByCid(listID);
+			contrepo.deleteById(listID);
+			return "redirect:/";
+		}
+		
 		
 		
 		@RequestMapping("/logout-success")

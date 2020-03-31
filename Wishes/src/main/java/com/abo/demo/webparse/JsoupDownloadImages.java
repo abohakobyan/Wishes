@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -17,6 +18,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Component
@@ -29,7 +31,7 @@ public class JsoupDownloadImages {
 	
 	    //private static String IMAGE_DESTINATION_FOLDER = "\\src\\main\\resources\\static\\photos";
 	    //Parses The Website and pulls items
-	    public String ParseLink(String link, String Cid, String imgT) throws IOException {
+	    public String ParseLink(String link, String Cid, String imgT,String title, String mmlink) throws IOException {
 	        
 	        //replace it with your URL 
 	        String strURL = link;
@@ -52,13 +54,14 @@ public class JsoupDownloadImages {
 	            
 	            //download image one by one
 	            
-	            return(downloadImage(strImageURL,Cid, imgT));
+	            return(downloadImage(strImageURL,Cid, imgT,title,mmlink));
 	            
 	        }
 	        return "notsaved";
 	    }
 	    
-	    public  String downloadImage(String strImageURL,String cid ,String imgT){
+	    public  String downloadImage(String strImageURL,String cid ,String imgT, String title, String link){
+	    	if(strImageURL!="itemplaceholder.png") {
 	        Path absolutePath=Paths.get(".");
 	        Path path = Paths.get(absolutePath+ "/src/main/resources/static/photos/");
 	        //get file name from image path
@@ -66,10 +69,6 @@ public class JsoupDownloadImages {
 	                strImageURL.substring( strImageURL.lastIndexOf("\\") + 1 );
 	        
 	        System.out.println("Saving: " + strImageName + ", from: " + strImageURL);
-	        
-	        
-	        
-	        
 	        try {
 	            
 	            //open the stream from URL
@@ -87,10 +86,13 @@ public class JsoupDownloadImages {
 	                os.write(buffer, 0, n);
 	            }
 	            
-	            //saving image name to database
+	          
+	          //saving image name to database
 	            Contentimages conimg= new Contentimages();
 	            conimg.setImgpath(strImageName+ "." +imgT);
 	            conimg.setCid(cid);
+	            conimg.setTitle(title);
+	            conimg.setLink(link);
 	            ImgRepo.save(conimg);
 	            //close the stream
 	            os.close();
@@ -100,8 +102,43 @@ public class JsoupDownloadImages {
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }
+	    	}else {
+	    	
+	        Contentimages conimg= new Contentimages();
+	        conimg.setImgpath(strImageURL);
+	        conimg.setCid(cid);
+            conimg.setTitle(title);
+            conimg.setLink(link);
+            ImgRepo.save(conimg);
+            return strImageURL;
+	    	}
 	       return "notsaved";
 	    }
+	    public  void getImage(MultipartFile file,String cid , String title, String link){
+	    	Path absolutePath=Paths.get(".");
+	        Path path = Paths.get(absolutePath+ "/src/main/resources/static/photos/");
+	    	try {
+				byte[] bytes = file.getBytes();
+				String fname = path +  "\\"+ link.replaceAll("\\W+", "") +file.getOriginalFilename();
+				path = Paths.get(fname);
+				   Files.write(path,bytes);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	Contentimages conimg= new Contentimages();
+	        conimg.setImgpath(link.replaceAll("\\W+", "") + file.getOriginalFilename());
+	        conimg.setCid(cid);
+            conimg.setTitle(title);
+            conimg.setLink(link);
+            ImgRepo.save(conimg);
+	    	
+	    }
+	
+	    
+	    
+	    
+	    
 	    public String guessImgType(String imgUrl) throws IOException {
 	    	// URLConnection.guessContentTypeFromStream only needs the first 12 bytes, but
 	    	// just to be safe from future java api enhancements, we'll use a larger number
