@@ -10,6 +10,47 @@ img{
 	width:300px;
 	height:200px;
 }
+.image-area {
+  position: relative;
+  width: 50%;
+  background: #333;
+}
+.image-area img{
+  max-width: 100%;
+  height: auto;
+}
+
+.remove-image {
+display: none;
+position: absolute;
+top: -10px;
+right: -10px;
+border-radius: 10em;
+padding: 2px 6px 3px;
+text-decoration: none;
+font: 700 21px/20px sans-serif;
+background: #555;
+border: 3px solid #fff;
+color: #FFF;
+box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  -webkit-transition: background 0.5s;
+  transition: background 0.5s;
+}
+.remove-image:hover {
+ background: #E54E4E;
+  padding: 3px 7px 5px;
+  top: -11px;
+right: -11px;
+}
+.remove-image:active {
+ background: #E54E4E;
+  top: -10px;
+right: -11px;
+}
+
+
+
 </style>
 </head>
 <body>
@@ -18,13 +59,24 @@ img{
  	 
  	 <h1>Upload a link</h1>
 
-	
-	<form action="newItem" method='POST' >
+	<a href="/"> back </a>
+	<form action="newItem" method='POST' enctype="multipart/form-data">
 		<table>
 		<tr>
-		<td>ImageLink:</td>
-		<td><input type="url" name="imgLink"> <br></td>
-		<td><input type="hidden" name ="listID" th:value= "${modelAndView.model.listID}"></td>
+		<td>Link to you item:*</td>
+		<td><input type="url" name="link"/></td>
+		<tr>
+		<td>Link to a image of the item:</td>
+		<td><input type="url" name="imgpath"/></td>
+		<td> Or  Select Image:</td>
+		<td> <input type="file" name="file" accept="image/*"/></td>
+		</tr>
+		<tr>
+		<td>Name of the item:</td>
+		<td><input type="text" name="title"/></td>
+		</tr>
+		<tr>
+		<td><input type="hidden" name ="listID" th:value= "${modelAndView.model.listID}"/></td>
 		
 		
 		<tr>
@@ -37,7 +89,14 @@ img{
 		<table>
 		 <tr th:each="Content : ${contentImages}">
         	<td th:text="${Content.key}">Key</td>
-        	<td><img th:src = "@{${'/photos/' +Content.value.imgpath}}" alt = "Image Did not Load Try Again Later"/></td>
+        	<td>
+        	<div class="image-area">
+        	<a th:href="${Content.value.link}" target="_blank">
+        	<img th:src = "@{${'/photos/' +Content.value.imgpath}}" alt = "Image Did not Load Try Again Later" /> </a>
+        	<a class="remove-image" th:href="@{${'/deleteimg?img_id=' + Content.value.img_id+'&listID=' +modelAndView.model.listID}}" style="display: inline;">&#215;</a>
+			</div>
+        	</td>
+        	<td th:text="${Content.value.title}">Title</td>
         	</tr>
         </table>
    

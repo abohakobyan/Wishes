@@ -3,29 +3,34 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Wishes</title>
+<link rel="stylesheet" type="text/css" href="CSS/login.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body><h1>LogIn</h1>
-
+<body>
+<div class="box">
+<img src="images/mainlogo.png" alt="Wishes" id="mainlogo"/>
+	
 	<form action="login" method='POST' >
-		<table>
-		<tr>
-		<td>UserName:</td>
-		<td><input type="text" name="username"> <br></td>
-		</tr>
-		<tr>
-		<td>Password:</td>
-		<td><input type="password" name="password"> <br></td>
-		</tr>
-		<tr>
-		<td><input name="submit" type="submit" value="submit"> <br></td>
+		<div class="inputBox">
+		<input type="text" name="username" required 
+		onkeyup="this.setAttribute('value', this.value);" value=""> 
+		<label>UserName</label>
+		</div>
+		<div class="inputBox">
+		<input type="password" name="password" required value=""
+             onkeyup="this.setAttribute('value', this.value);"> 
+		<label>Password</label>
+		</div>
+		<input name="login" type="submit" value="Log In"> 
 		
-		</tr>
-		</table>
+		
 		</form>
-		<form action="/signup">
-    <input type="submit" value="SignUp" />
+	<form action="/signup">
+    <input type="submit" value="Sign Up" name="SignUp" />
+   
 </form>
+ </div>
 
 </body>
 </html>
