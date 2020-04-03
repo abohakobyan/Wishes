@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Select the image you would like to use</title>
+</head>
+<body>
+		
+		<table>
+		<tr th:each="Content : ${Images}">
+        	<!-- <td th:text="${Content.key}">Key</td>-->
+        	<td>
+        	<div class="image-area">
+        	<a th:href="@{'/newItem'(imgpath=${Content}, listID=${modelAndView.model.listID}, link=${modelAndView.model.contLink},title=${modelAndView.model.title})}">
+        	<img th:src = "${Content}"  onerror='this.style.display = "none"' />
+        	</a>
+			</div>
+        	</td>
+        	
+        	</tr>
+        </table>
+		
+		      <!--  	<a th:href="@{${'/newItem?imgpath=' + Content +'&listID=' +modelAndView.model.listID + '&link=' +modelAndView.model.contLink+'&title=' +modelAndView.model.title}}"> --> 
+		
+		
+</body>
+</html>

@@ -7,7 +7,7 @@
   width: 25rem;
   padding: 2.5rem;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.6);
+  background: #10003f;
   border-radius: 0.625rem;
 }
 .box img {  
@@ -42,6 +42,9 @@
   color: #fff;
   pointer-events: none;
   transition: 0.5s;
+}
+p{
+	color :red;
 }
 
 .box .inputBox input:focus ~ label,

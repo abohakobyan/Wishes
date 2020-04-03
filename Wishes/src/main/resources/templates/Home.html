@@ -3,49 +3,55 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Your Lists</title>
 <link rel="stylesheet" type="text/css" href="CSS/home.css">
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
 
 </script>
 
 </head>
 <body>
- 	 Welcome
- 	 <a href="/logout"> logout </a>
- 	 
- 	 <h1>Upload a link</h1>
+<div class= "header">
+ <img src="images/mainlogo.png" alt="Wishes" id="mainlogo"/>
+ 	 <form name="logout" method="post" action="logout">
+ 	 <label class="logoutLblPos">
+ 	 <input type="image"  name="logout"  value="log out" src="images/logout.png">
+ 	 </label>
+	</form>
+
+
+</div>
+ 	
+ 	 <h1>Your Lists</h1>
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+	<div class="box">
 	
 	<form action="newlist" method='POST' >
 		<table>
 		<tr>
 		<td>Create New List:</td>
-		<td><input type="text" name="listName"> <br></td>
-		</tr>
-		<tr>
+		<td><input type="text" name="listName" maxlength="30"> <br></td>
+		
 		<td><input name="submit" type="submit" value="submit"> <br></td>
 		</tr>
 		</table>
 		</form>
-		<div class="Images" >
-	
-		<table>
-		 <tr th:each="Content : ${contentLists}" >
-        	<td>
+		</div>
+		<div class="images">
+		 <div th:each="Content : ${contentLists}" >
+        	
         	<div class="image-area">
         	<a th:href="@{${'/list?Cid=' + Content.key}}" >
-        	<img th:src = "@{${'/photos/listplaceholder.png'}}" alt = "Image Did not Load Try Again Later"/></a>
+        	<img th:src = "@{${'/photos/listplaceholder.png'}}" alt = "Image Did not Load Try Again Later"/>
+        	<label class="title" th:text= "${Content.value.listtitle}">Title</label></a>
+        	
         	<a class="remove-image" th:href="@{${'/deletelist?listID=' + Content.key}}" style="display: inline;">&#215;</a>
         	</div>
-        	</td>
-        	<td th:text= "${Content.value.listtitle}">Title</td>
-        	</tr>
-        </table>
-   
-		</div>
-
+        	
+        	</div>
+		
+</div>
 </body>
 </html>

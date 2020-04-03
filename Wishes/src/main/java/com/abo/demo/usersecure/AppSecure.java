@@ -34,6 +34,8 @@ public class AppSecure extends WebSecurityConfigurerAdapter
 		.csrf().disable()
 		.authorizeRequests().antMatchers("/signup").permitAll()
 		.and()
+		.authorizeRequests().antMatchers("/signups").permitAll()
+		.and()
 		.authorizeRequests().antMatchers("/images/**").permitAll()
 		.and()
 		.authorizeRequests().antMatchers("/CSS/**").permitAll()

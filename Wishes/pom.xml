@@ -19,6 +19,15 @@
 	</properties>
 
 	<dependencies>
+<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-maven-archetypes -->
+<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+
+<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-web -->
+
+<!-- https://mvnrepository.com/artifact/com.sun.net.httpserver/http -->
+  				
+
+
 
 	<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
 <dependency>
@@ -109,6 +118,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.abo.urlstreamhandler</groupId>
+				<artifactId>com.abo.urlstreamhandler</artifactId>
 			</plugin>
 		</plugins>
 	</build>

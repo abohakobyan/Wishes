@@ -5,100 +5,108 @@
 <meta charset="ISO-8859-1">
 <title>Your List</title>
 
-<style>
-img{
-	width:300px;
-	height:200px;
-}
-.image-area {
-  position: relative;
-  width: 50%;
-  background: #333;
-}
-.image-area img{
-  max-width: 100%;
-  height: auto;
-}
+<link rel="stylesheet" type="text/css" href="CSS/home.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+ var fileInput = document.getElementById("document_attachment_doc");
 
-.remove-image {
-display: none;
-position: absolute;
-top: -10px;
-right: -10px;
-border-radius: 10em;
-padding: 2px 6px 3px;
-text-decoration: none;
-font: 700 21px/20px sans-serif;
-background: #555;
-border: 3px solid #fff;
-color: #FFF;
-box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.3);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  -webkit-transition: background 0.5s;
-  transition: background 0.5s;
+
+window.addEventListener('paste', e => {
+	var fileInput = document.getElementById("document_attachment_doc");
+	if(e.clipboardData.files.length != 0){
+	fileInput.files = e.clipboardData.files;}
+	});
+
+function chgAction(){
+	var imgpath = document.forms["contsubmit"]["imgpath"].value;
+	var upimg = document.forms["contsubmit"]["file"].value;
+	if(imgpath=="" && upimg==""){
+		document.forms["contsubmit"].action = "/selectImg";
+
+		}
 }
-.remove-image:hover {
- background: #E54E4E;
-  padding: 3px 7px 5px;
-  top: -11px;
-right: -11px;
+function hideForAuto(){
+	var inputs = document.getElementsByClassName('manual');
+	for(var i =0; i< inputs.length; i++){
+		inputs[i].style.visibility = "hidden";
+	}
 }
-.remove-image:active {
- background: #E54E4E;
-  top: -10px;
-right: -11px;
+function showForManual(){
+	var inputs = document.getElementsByClassName('manual');
+	for(var i =0; i< inputs.length; i++){
+		inputs[i].style.visibility = "visible";
+	}
 }
 
 
+</script>
 
-</style>
 </head>
 <body>
- 	 Welcome
- 	 <a href="/logout"> logout </a>
- 	 
- 	 <h1>Upload a link</h1>
+<div class= "header">
+<a href="/"><img src="images/mainlogo.png" alt="Wishes" id="mainlogo"/>	</a>
+<form name="logout" method="post" action="logout">
+ 	 <label class="logoutLblPos">
+ 	 <input type="image"  name="logout"  value="log out" src="images/logout.png">
+ 	 </label>
+	</form>
+</div>
 
-	<a href="/"> back </a>
-	<form action="newItem" method='POST' enctype="multipart/form-data">
+ 	  
+ 	 
+ 	 <h1>New Item</h1>
+
+
+	
+	<div class="box">
+	
+	
+	<form name=contsubmit action="newItem" method='POST' enctype="multipart/form-data" onsubmit="chgAction()">
 		<table>
+		
 		<tr>
 		<td>Link to you item:*</td>
 		<td><input type="url" name="link"/></td>
+		<td><input name="submit" type="submit" value="submit"> </td>
 		<tr>
+		<td>
+		<input type="radio" onchange="hideForAuto()" name="autoormanual" checked>Automatic </td>
+		<td>
+		<input type="radio" onchange="showForManual()" name="autoormanual" checked>Manual </td>
+		</tr>
+		<tr class = "manual" >
 		<td>Link to a image of the item:</td>
 		<td><input type="url" name="imgpath"/></td>
 		<td> Or  Select Image:</td>
-		<td> <input type="file" name="file" accept="image/*"/></td>
+		<td> <input type="file"   id="document_attachment_doc" name="file" accept="image/*"/></td>
 		</tr>
-		<tr>
+		<tr class = "manual" >
 		<td>Name of the item:</td>
-		<td><input type="text" name="title"/></td>
+		<td><input type="text" name="title" maxlength="50"/></td>
 		</tr>
+		
 		<tr>
 		<td><input type="hidden" name ="listID" th:value= "${modelAndView.model.listID}"/></td>
-		
-		
-		<tr>
-		<td><input name="submit" type="submit" value="submit"> <br></td>
-		</tr>
 		</table>
 		</form>
-		<div class="Images" >
+		</div>
+		<div class="images" >
 		<!-- <img th:src = "@{${'/photos/' + Contentimages.link}" alt = ""/>-->
-		<table>
-		 <tr th:each="Content : ${contentImages}">
-        	<td th:text="${Content.key}">Key</td>
-        	<td>
+		
+		 <div th:each="Content : ${contentImages}">
+        	
+        	
         	<div class="image-area">
         	<a th:href="${Content.value.link}" target="_blank">
-        	<img th:src = "@{${'/photos/' +Content.value.imgpath}}" alt = "Image Did not Load Try Again Later" /> </a>
+        	<img th:src = "@{${'/photos/' +Content.value.imgpath}}" alt = "Image Did not Load Try Again Later" /> 
+        	<label class="title" th:text="${Content.value.title}">Title</label></a>
         	<a class="remove-image" th:href="@{${'/deleteimg?img_id=' + Content.value.img_id+'&listID=' +modelAndView.model.listID}}" style="display: inline;">&#215;</a>
+			
 			</div>
-        	</td>
-        	<td th:text="${Content.value.title}">Title</td>
-        	</tr>
-        </table>
+        	
+        	
+        	
+       </div>
    
 		</div>
 		

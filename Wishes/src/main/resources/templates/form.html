@@ -1,27 +1,38 @@
+
+<!DOCTYPE html>
 <html>
-    <body>
+<head>
+<meta charset="ISO-8859-1">
+<title>Wishes Sign Up</title>
+<link rel="stylesheet" type="text/css" href="CSS/login.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="box">
+<img src="images/mainlogo.png" alt="Wishes" id="mainlogo"/>
         <form action="#" th:action="@{/signup}" th:object="${signUpForm}" method="post">
-            <table>
-                <tr>
-                    <td>Name:</td>
-                    <td><input type="text" th:field="*{username}" /></td>
-                    <td th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Name Error</td>
-                </tr>
-                <tr>
-                    <td>Password:</td>
-                    <td><input type="password" th:field="*{password1}" /></td>
-                    <td th:if="${#fields.hasErrors('password1')}" th:errors="*{password1}">Password1 Error</td>
-                </tr>
-                <tr>
-                    <td>Password Repeat:</td>
-                    <td><input type="password" th:field="*{password2}" /></td>
-                    <td th:if="${#fields.hasErrors('password2')}" th:errors="*{password2}">Password2 Error</td>
-                </tr>
-                <tr>
-                
-                    <td><button type="submit">Submit</button></td>
-                </tr>
-            </table>
+            	<div class="inputBox">
+                   
+                    <input type="email" th:field="*{username}" required onkeyup="this.setAttribute('value', this.value);" value=""/>
+                   <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Name Error</p>
+               		<label>Email Address</label>
+                </div>
+                   <div class="inputBox">
+                   <input type="password" th:field="*{password1}" required value="" onkeyup="this.setAttribute('value', this.value);"
+                    	  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+                              title="Must contain at least one number and one uppercase and lowercase letter, and at least 6 or more characters" />
+                    <p th:if="${#fields.hasErrors('password1')}" th:errors="*{password1}">Password1 Error</p>
+                     <label>Password</label>
+                    </div>
+               <div class="inputBox">
+                    <input type="password" th:field="*{password2}" required value="" onkeyup="this.setAttribute('value', this.value);"
+                    	  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+                              title="Must match!" />
+                  <p th:if="${#fields.hasErrors('password2')}" th:errors="*{password2}">Password2 Error</p>
+                    <label>Repeat Password</label>
+               </div>
+                	<input name="signup" type="submit" value="Sign Up"> 
         </form>
+        </div>
     </body>
 </html>

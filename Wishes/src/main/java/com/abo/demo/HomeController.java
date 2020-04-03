@@ -1,6 +1,7 @@
 package com.abo.demo;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,10 +111,13 @@ public class HomeController implements WebMvcConfigurer {
 			u.setPass(cript.encode(nuser.getPassword1()));
 			u.setUsername(nuser.getUsername());
 			userrepo.save(u);
-			return "form.html";
+			return "signupsuccess.html";
 			}
 	
-		
+		@RequestMapping("/signups")
+		public String signupSuccess() {
+		return "signupsuccess.html";
+		}
 		
 		
 		
@@ -161,11 +165,69 @@ public class HomeController implements WebMvcConfigurer {
 					e.printStackTrace();
 					}
 				jsDownload.downloadImage(imageLink.getImgpath(),listID, imgT,imageLink.getTitle(),imageLink.getLink());	
+				try {
+					TimeUnit.SECONDS.sleep(3);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}else if(!file.isEmpty()){
 				jsDownload.getImage(file,listID,imageLink.getTitle(),imageLink.getLink());	
+				try {
+					TimeUnit.SECONDS.sleep(3);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}else {
 				jsDownload.downloadImage("itemplaceholder.png" ,listID, imgT,imageLink.getTitle(),imageLink.getLink());	
 			}
+			
+			return "redirect:/list?Cid=" + listID;
+		
+		
+		}
+		@PostMapping("/selectImg")
+		public ModelAndView selectImg(@ModelAttribute("listID") String listID,@ModelAttribute("link") String imageLink,ModelAndView modelAndView){
+			ArrayList<String> l = new ArrayList<String>();
+			try {
+					l = jsDownload.ParseLink(imageLink);
+				} catch (IOException e) {
+					Contentimages c = new Contentimages();
+					c.setLink(imageLink);
+					c.setImgpath("itemplaceholder.png");
+					String a = submitItem(listID,c);
+					modelAndView.setViewName(a);
+					return modelAndView;
+				}
+				modelAndView.addObject("title", l.get(0));
+				l.remove(0);
+				//ModelAndView modelAndView = new ModelAndView();
+				modelAndView.addObject("contLink", imageLink);
+				//ModelAndView usC = new ModelAndView();
+				modelAndView.addObject("Images", l);
+				modelAndView.setViewName("selectImg.html");
+				modelAndView.addObject("listID", listID);
+				
+			return modelAndView;
+		}
+		
+		public String submitItem(@ModelAttribute("listID") String listID,@ModelAttribute("Contentimages") Contentimages imageLink) {
+			
+			jsDownload.downloadImage("itemplaceholder.png" ,listID, null,imageLink.getTitle(),imageLink.getLink());
+			return "redirect:/list?Cid=" + listID;
+		}
+		@GetMapping("/newItem")
+		public String submitItemFromList(@ModelAttribute("listID") String listID,@ModelAttribute("Contentimages") Contentimages imageLink) {
+			String imgT =null;
+			try {
+				
+				imgT = jsDownload.guessImgType(imageLink.getImgpath());
+				} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			jsDownload.downloadImage(imageLink.getImgpath(),listID, imgT,imageLink.getTitle(),imageLink.getLink());
 			try {
 				TimeUnit.SECONDS.sleep(3);
 			} catch (InterruptedException e) {
@@ -173,9 +235,11 @@ public class HomeController implements WebMvcConfigurer {
 				e.printStackTrace();
 			}
 			return "redirect:/list?Cid=" + listID;
-		
-		
 		}
+		
+		
+		
+		
 		@GetMapping("/deleteimg")
 		public String removeImg(@ModelAttribute("img_id") int img_id,@ModelAttribute("listID") String listID) {
 			imgrepo.deleteById(img_id);
@@ -188,6 +252,8 @@ public class HomeController implements WebMvcConfigurer {
 			contrepo.deleteById(listID);
 			return "redirect:/";
 		}
+		
+		
 		
 		
 		
