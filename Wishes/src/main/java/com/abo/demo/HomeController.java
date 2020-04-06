@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -253,12 +256,20 @@ public class HomeController implements WebMvcConfigurer {
 			return "redirect:/";
 		}
 		
-		
+		@GetMapping("/img/{id}")
+		public void getImage(@PathVariable("id") Integer id, HttpServletResponse response) {
+			try {
+				jsDownload.writeImageToRespose(id, response);
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+		}
 		
 		
 		
 		@RequestMapping("/logout-success")
 		public String logoutPage() {
-			return "logout.html";
+			return "signupsuccess.html";
 		}
 }

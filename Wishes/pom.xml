@@ -19,22 +19,12 @@
 	</properties>
 
 	<dependencies>
-<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-maven-archetypes -->
-<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
-
-<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-web -->
-
-<!-- https://mvnrepository.com/artifact/com.sun.net.httpserver/http -->
-  				
-
-
-
 	<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
-<dependency>
-    <groupId>org.jsoup</groupId>
-    <artifactId>jsoup</artifactId>
-    <version>1.13.1</version>
-</dependency>
+		<dependency>
+    		<groupId>org.jsoup</groupId>
+    		<artifactId>jsoup</artifactId>
+  			<version>1.13.1</version>
+		</dependency>
 	
 		<dependency>
             <groupId>javax.servlet</groupId>
@@ -49,19 +39,16 @@
             <scope>runtime</scope>
         </dependency>
 	
-	
-	
-	
-	
-	
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -72,12 +59,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 			<exclusions>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
+			<exclusion>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			</exclusion>
 			</exclusions>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
@@ -89,28 +77,23 @@
 		    <artifactId>tomcat-jasper</artifactId>
 		    <version>9.0.30</version>
 		</dependency>
-		<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-</dependency>
-<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
-<dependency>
-    <groupId>commons-beanutils</groupId>
-    <artifactId>commons-beanutils</artifactId>
-    <version>1.9.4</version>
-</dependency>
-
-
-
-
-
-
-
 		
+		<dependency>
+   			<groupId>mysql</groupId>
+    		<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+		<dependency>
+   			<groupId>commons-beanutils</groupId>
+    		<artifactId>commons-beanutils</artifactId>
+    		<version>1.9.4</version>
+		</dependency>
+	
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
+		
 	</dependencies>
 
 	<build>
@@ -119,11 +102,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<plugin>
-				<groupId>com.abo.urlstreamhandler</groupId>
-				<artifactId>com.abo.urlstreamhandler</artifactId>
-			</plugin>
+			
 		</plugins>
 	</build>
-
 </project>

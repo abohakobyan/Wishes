@@ -98,7 +98,7 @@ function showForManual(){
         	
         	<div class="image-area">
         	<a th:href="${Content.value.link}" target="_blank">
-        	<img th:src = "@{${'/photos/' +Content.value.imgpath}}" alt = "Image Did not Load Try Again Later" /> 
+        	<img th:src = "@{${'/img/' +Content.value.img_id}}" alt = "images/itemplaceholder.png" /> 
         	<label class="title" th:text="${Content.value.title}">Title</label></a>
         	<a class="remove-image" th:href="@{${'/deleteimg?img_id=' + Content.value.img_id+'&listID=' +modelAndView.model.listID}}" style="display: inline;">&#215;</a>
 			

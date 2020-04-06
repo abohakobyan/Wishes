@@ -2,6 +2,9 @@ package com.abo.demo.webparse;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +17,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,6 +33,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.abo.demo.lists.UsercontentRepo;
+
 import java.io.IOException; 
 import java.net.URL; 
 
@@ -33,22 +43,32 @@ import java.net.URL;
 public class JsoupDownloadImages  {		
 	
 	@Autowired
+	ImagesRepo imgrepo;
+	
+	public void writeImageToRespose(int id, HttpServletResponse response) throws IOException {
+	        //store image in browser cache
+	        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
+	        response.setHeader("Cache-Control", "max-age=2628000");
+	        Optional<Contentimages> c = imgrepo.findById(id);
+	      
+	        //obtaining bytes from DB
+	      
+
+	        //Some conversion
+	        //Maybe to base64 string or something else
+	        //Pay attention to encoding (UTF-8, etc)
+	       
+	        //write result to http response
+	       
+	        try (OutputStream out = response.getOutputStream()) {
+	            out.write(c.get().getImg_data());
+	         
+	        }
+	}
+	@Autowired
 	ImagesRepo ImgRepo;
 	boolean alreadyExecuted=false;
 	
-//	JsoupDownloadImages(){
-//// 		if(!alreadyExecuted) {
-////		 URL.setURLStreamHandlerFactory( protocol ->
-////      	protocol.equals( "http" ) ? new HttpHandler() :
-////      	protocol.equals( "https" ) ? new HttpsHandler() : null );
-////		 launch(  );
-////		 alreadyExecuted=true;}
-//	}
-	
-	
-	    //private static String IMAGE_DESTINATION_FOLDER = "\\src\\main\\resources\\static\\photos";
-	    //Parses The Website and pulls items
-	    
 		public ArrayList<String> ParseLink(String link) throws IOException {
 	    
 //	    	String[]as = new String[10];
@@ -122,50 +142,58 @@ public class JsoupDownloadImages  {
 	    
 	    public  String downloadImage(String strImageURL,String cid ,String imgT, String title, String link){
 	    	if(strImageURL!="itemplaceholder.png") {
-	        Path absolutePath=Paths.get(".");
-	        Path path = Paths.get(absolutePath+ "/src/main/resources/static/photos/");
+//	        Path absolutePath=Paths.get(".");
+//	        Path path = Paths.get(absolutePath+ "/src/main/resources/static/photos/");
+//	        
 	        //get file name from image path
-	        String strImageName = 
-	                strImageURL.substring( strImageURL.lastIndexOf("\\") + 1 );
-	        
-	        System.out.println("Saving: " + strImageName + ", from: " + strImageURL);
+//	        String strImageName = 
+//	                strImageURL.substring( strImageURL.lastIndexOf("\\") + 1 );
+//	        
+//	        System.out.println("Saving: " + strImageName + ", from: " + strImageURL);
 	        try {
 	            
 	            //open the stream from URL
 	            URL urlImage = new URL(strImageURL);
 	            InputStream in = urlImage.openStream();
-	            strImageName = strImageName.replaceAll("\\W+", "");
-	            byte[] buffer = new byte[4096];
-	            int n = -1;
-	            String fname = path + "\\"+ strImageName+ "." + imgT;
-	            OutputStream os = 
-	                new FileOutputStream( fname );
+//	            InputStream in = getClass().getResourceAsStream(strImageURL); 
+	            ByteArrayOutputStream output = new ByteArrayOutputStream();
+	            byte[] buffer = new byte[1024];
+	            int count;
+	            while ((count = in.read(buffer)) != -1)
+	                output.write(buffer, 0, count);
+	            byte[] contents = output.toByteArray();
+	          //  strImageName = strImageName.replaceAll("\\W+", "");
+//	            byte[] buffer = new byte[4096];
+//	            int n = -1;
+	          //  String fname = path + "\\"+ strImageName+ "." + imgT;
+//	            OutputStream os = 
+//	                new FileOutputStream(null);
 	            
 	            //write bytes to the output stream
-	            while ( (n = in.read(buffer)) != -1 ){
-	                os.write(buffer, 0, n);
-	            }
-	            
-	          
-	          //saving image name to database
+//	            while ( (n = in.read(buffer)) != -1 ){
+//	                os.write(buffer, 0, n);
+//	            }
+//	            File f = new File();
+//	            FileInputStream fis = new FileInputStream(f);
+//	          //saving image name to database
 	            Contentimages conimg= new Contentimages();
-	            conimg.setImgpath(strImageName+ "." +imgT);
+	            conimg.setImg_data(contents);
 	            conimg.setCid(cid);
 	            conimg.setTitle(title);
 	            conimg.setLink(link);
 	            ImgRepo.save(conimg);
 	            //close the stream
-	            os.close();
+	         //   os.close();
 	            
-	            return strImageName + "." + imgT;
+	            return "Saved The Image From URL";
 	            
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }
 	    	}else {
 	    	
-	        Contentimages conimg= new Contentimages();
-	        conimg.setImgpath(strImageURL);
+	      Contentimages conimg= new Contentimages();
+	        
 	        conimg.setCid(cid);
             conimg.setTitle(title);
             conimg.setLink(link);
@@ -175,19 +203,30 @@ public class JsoupDownloadImages  {
 	       return "notsaved";
 	    }
 	    public  void getImage(MultipartFile file,String cid , String title, String link){
-	    	Path absolutePath=Paths.get(".");
-	        Path path = Paths.get(absolutePath+ "/src/main/resources/static/photos/");
+//	    	Path absolutePath=Paths.get(".");
+//	        Path path = Paths.get(absolutePath+ "/src/main/resources/static/photos/");
+	        byte[] in = null;
 	    	try {
-				byte[] bytes = file.getBytes();
-				String fname = path +  "\\"+ link.replaceAll("\\W+", "") +file.getOriginalFilename();
-				path = Paths.get(fname);
-				   Files.write(path,bytes);
+	    		in = file.getBytes();
+	    		
+	    		
+	    		
+//				//byte[] bytes = file.getBytes();
+////				String fname = path +  "\\"+ link.replaceAll("\\W+", "") +file.getOriginalFilename();
+////				path = Paths.get(fname);
+//				int n = -1;
+//				while ( (n = in.read(bytes)) != -1 ){
+//	                os.write(buffer, 0, n);
+//	            }
+//				file.getInputStream()
+//				   Files.write(path,bytes);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	    	Contentimages conimg= new Contentimages();
-	        conimg.setImgpath(link.replaceAll("\\W+", "") + file.getOriginalFilename());
+	      //  conimg.setImgpath(link.replaceAll("\\W+", "") + file.getOriginalFilename());
+	    	conimg.setImg_data(in);
 	        conimg.setCid(cid);
             conimg.setTitle(title);
             conimg.setLink(link);
