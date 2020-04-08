@@ -6,20 +6,23 @@
 <title>Wishes Log In</title>
 <link rel="stylesheet" type="text/css" href="CSS/login.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="images/mainlogo.png" >
 </head>
 <body>
 <div class="box">
 <img src="images/mainlogo.png" alt="Wishes" id="mainlogo"/>
-	
+	<p th:if="${loginError}" class="error">Invalid email or password</p>
 	<form action="login" method='POST' >
 		<div class="inputBox">
 		<input type="text" name="username" required 
 		onkeyup="this.setAttribute('value', this.value);" value=""> 
+		
 		<label>Email Address</label>
 		</div>
 		<div class="inputBox">
 		<input type="password" name="password" required value=""
              onkeyup="this.setAttribute('value', this.value);"> 
+            
 		<label>Password</label>
 		</div>
 		<input name="login" type="submit" value="Log In"> 

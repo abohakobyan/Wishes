@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -53,19 +55,7 @@ public class HomeController implements WebMvcConfigurer {
 	@Autowired
 	JsoupDownloadImages jsDownload;
 	
-//	@Autowired
-//	@Qualifier("newUserValidator")
-//	private Validator validator;
-//		
-//	@InitBinder
-//	   private void initBinder(WebDataBinder binder) {
-//	      binder.setValidator(validator);;
-//	   }
-//	@Override
-//	public void addViewControllers(ViewControllerRegistry registry) {
-//		registry.addViewController("/results").setViewName("results");
-//	}
-//	
+
 		@RequestMapping(value = "/id", method = RequestMethod.GET)
 	    @ResponseBody
 	    public String currentUserName(Authentication authentication) {
@@ -92,7 +82,11 @@ public class HomeController implements WebMvcConfigurer {
 		public String loginPage() {
 			return "login.html";
 		}
-		
+		@RequestMapping("/login-error.html")
+		  public String loginError(Model model) {
+		    model.addAttribute("loginError", true);
+		    return "login.html";
+		  }
 
 		@GetMapping(value = "/signup")
 		public String addNuser(SignUpForm nuser) { 
@@ -122,16 +116,17 @@ public class HomeController implements WebMvcConfigurer {
 		return "signupsuccess.html";
 		}
 		
-		
-		
+		//Takes the list name and makes a new list 
 		@PostMapping("/newlist")
-		public String submitLink(@ModelAttribute("listName") String listName) {
-				
+		public String submitLink(@ModelAttribute("listName") String listName, @ModelAttribute("privateorpublic") String priv) {
+			
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			UserPrinciple p = (UserPrinciple) authentication.getPrincipal();
-			int uid= p.getID();
 			
+			int uid= p.getID();
 			Usercontent cont = new Usercontent();
+			if(priv.equals("false")) cont.setPriv(false);
+			else cont.setPriv(true);
 			cont.setUid(uid);
 			String uniqueID = UUID.randomUUID().toString();
 			cont.setListtitle(listName);
@@ -140,49 +135,44 @@ public class HomeController implements WebMvcConfigurer {
 			return "redirect:/";
 		}
 		
-		
+		//Populates the list page based on listID
 		@GetMapping("/list")
-		public ModelAndView list(ModelAndView modelAndView,@ModelAttribute("Cid") String listID) {
+		public ModelAndView list(ModelAndView modelAndView,@ModelAttribute("Cid") String listID, @ModelAttribute("listtitle") String listtitle) {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			UserPrinciple p = (UserPrinciple) authentication.getPrincipal();
+			int uid= p.getID();
+			Optional<Usercontent> valList = contrepo.findById(listID);
+			if(valList.get().getUid() == uid || !valList.get().isPriv()) {
 			List<Contentimages> imgs = imgrepo.findByCid(listID);
+			
+			
 			Map<String, Contentimages> modelImg = new HashMap<String,Contentimages>();
 			for (Contentimages i : imgs) modelImg.put(String.valueOf(i.getImg_id()),i);
 			//ModelAndView usC = new ModelAndView();
+			modelAndView.addObject("listtitle", listtitle);
 			modelAndView.addObject("contentImages", modelImg);
 			modelAndView.setViewName("list.html");
 			modelAndView.addObject("listID", listID);
-			
 			return modelAndView;
-			
+			}
+			modelAndView.setViewName("redirect:/");
+			return modelAndView;
 		}
+		//Upload form 
 		@PostMapping("/newItem")
 		public String submitItem(@ModelAttribute("listID") String listID,@ModelAttribute("Contentimages") Contentimages imageLink,
 				@RequestParam("file") MultipartFile file) {
 			
 			String imgT =null;
+			//If no link to an image
 			if(!imageLink.getImgpath().isEmpty()) {
-				try {
-				
-					imgT = jsDownload.guessImgType(imageLink.getImgpath());
-					} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					}
 				jsDownload.downloadImage(imageLink.getImgpath(),listID, imgT,imageLink.getTitle(),imageLink.getLink());	
-				try {
-					TimeUnit.SECONDS.sleep(3);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}else if(!file.isEmpty()){
-				jsDownload.getImage(file,listID,imageLink.getTitle(),imageLink.getLink());	
-				try {
-					TimeUnit.SECONDS.sleep(3);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}else {
+			}
+			//If no file uploaded
+			else if(!file.isEmpty()){
+				jsDownload.getImage(file,listID,imageLink.getTitle(),imageLink.getLink());		
+			}
+			else {
 				jsDownload.downloadImage("itemplaceholder.png" ,listID, imgT,imageLink.getTitle(),imageLink.getLink());	
 			}
 			
@@ -190,23 +180,26 @@ public class HomeController implements WebMvcConfigurer {
 		
 		
 		}
+		//Java script edited form handles automatic image population of a selection page
 		@PostMapping("/selectImg")
-		public ModelAndView selectImg(@ModelAttribute("listID") String listID,@ModelAttribute("link") String imageLink,ModelAndView modelAndView){
+		public ModelAndView selectImg(@ModelAttribute("listID") String listID,@ModelAttribute("link") String link,ModelAndView modelAndView,@ModelAttribute("title") String title){
 			ArrayList<String> l = new ArrayList<String>();
 			try {
-					l = jsDownload.ParseLink(imageLink);
+					l = jsDownload.ParseLink(link);
 				} catch (IOException e) {
 					Contentimages c = new Contentimages();
-					c.setLink(imageLink);
+					c.setLink(link);
 					c.setImgpath("itemplaceholder.png");
 					String a = submitItem(listID,c);
 					modelAndView.setViewName(a);
 					return modelAndView;
 				}
+				if(title.isEmpty())
 				modelAndView.addObject("title", l.get(0));
+				else modelAndView.addObject("title", title);
 				l.remove(0);
 				//ModelAndView modelAndView = new ModelAndView();
-				modelAndView.addObject("contLink", imageLink);
+				modelAndView.addObject("contLink", link);
 				//ModelAndView usC = new ModelAndView();
 				modelAndView.addObject("Images", l);
 				modelAndView.setViewName("selectImg.html");
@@ -216,38 +209,23 @@ public class HomeController implements WebMvcConfigurer {
 		}
 		
 		public String submitItem(@ModelAttribute("listID") String listID,@ModelAttribute("Contentimages") Contentimages imageLink) {
-			
 			jsDownload.downloadImage("itemplaceholder.png" ,listID, null,imageLink.getTitle(),imageLink.getLink());
 			return "redirect:/list?Cid=" + listID;
 		}
+		
 		@GetMapping("/newItem")
 		public String submitItemFromList(@ModelAttribute("listID") String listID,@ModelAttribute("Contentimages") Contentimages imageLink) {
 			String imgT =null;
-			try {
-				
-				imgT = jsDownload.guessImgType(imageLink.getImgpath());
-				} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				}
 			jsDownload.downloadImage(imageLink.getImgpath(),listID, imgT,imageLink.getTitle(),imageLink.getLink());
-			try {
-				TimeUnit.SECONDS.sleep(3);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			return "redirect:/list?Cid=" + listID;
 		}
-		
-		
-		
-		
+			
 		@GetMapping("/deleteimg")
-		public String removeImg(@ModelAttribute("img_id") int img_id,@ModelAttribute("listID") String listID) {
+		public String removeImg(@ModelAttribute("img_id") int img_id, @ModelAttribute("listID") String listID) {
 			imgrepo.deleteById(img_id);
-			return "redirect:/list?Cid=" + listID;
+			return "back2.html";
 		}
+		
 		@GetMapping("/deletelist")
 		@Transactional
 		public String removeList(@ModelAttribute("listID") String listID) {
@@ -265,8 +243,6 @@ public class HomeController implements WebMvcConfigurer {
 				e.printStackTrace();
 			}
 		}
-		
-		
 		
 		@RequestMapping("/logout-success")
 		public String logoutPage() {

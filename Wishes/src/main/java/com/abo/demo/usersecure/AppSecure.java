@@ -32,6 +32,9 @@ public class AppSecure extends WebSecurityConfigurerAdapter
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 		.csrf().disable()
+		.authorizeRequests()
+        .antMatchers( "/favicon.ico").permitAll()
+        .and()
 		.authorizeRequests().antMatchers("/signup").permitAll()
 		.and()
 		.authorizeRequests().antMatchers("/signups").permitAll()
@@ -45,6 +48,7 @@ public class AppSecure extends WebSecurityConfigurerAdapter
 		.and()
 		.formLogin()
 		.loginPage("/login").permitAll()
+		.failureUrl("/login-error.html")
 		.and()
 		.logout().invalidateHttpSession(true)
 		.clearAuthentication(true)

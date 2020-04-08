@@ -7,6 +7,8 @@
 
 <link rel="stylesheet" type="text/css" href="CSS/home.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="images/mainlogo.png" >
+
 <script>
  var fileInput = document.getElementById("document_attachment_doc");
 
@@ -28,8 +30,15 @@ function chgAction(){
 function hideForAuto(){
 	var inputs = document.getElementsByClassName('manual');
 	for(var i =0; i< inputs.length; i++){
-		inputs[i].style.visibility = "hidden";
+		var q = inputs[i].getElementsByTagName("input");
+	    for(var l =0; l< q.length; l++){
+	        q[l].value = "";
+	    }
+	    inputs[i].style.visibility = "hidden";
+		
 	}
+	
+	
 }
 function showForManual(){
 	var inputs = document.getElementsByClassName('manual');
@@ -40,94 +49,60 @@ function showForManual(){
 
 
 </script>
-
 </head>
 <body>
-<div class= "header">
-<a href="/"><img src="images/mainlogo.png" alt="Wishes" id="mainlogo"/>	</a>
-<form name="logout" method="post" action="logout">
- 	 <label class="logoutLblPos">
- 	 <input type="image"  name="logout"  value="log out" src="images/logout.png">
- 	 </label>
-	</form>
-</div>
-
- 	  
- 	 
- 	 <h1>New Item</h1>
-
-
-	
-	<div class="box">
-	
-	
-	<form name=contsubmit action="newItem" method='POST' enctype="multipart/form-data" onsubmit="chgAction()">
-		<table>
-		
-		<tr>
-		<td>Link to you item:*</td>
-		<td><input type="url" name="link"/></td>
-		<td><input name="submit" type="submit" value="submit"> </td>
-		<tr>
-		<td>
-		<input type="radio" onchange="hideForAuto()" name="autoormanual" checked>Automatic </td>
-		<td>
-		<input type="radio" onchange="showForManual()" name="autoormanual" checked>Manual </td>
-		</tr>
-		<tr class = "manual" >
-		<td>Link to a image of the item:</td>
-		<td><input type="url" name="imgpath"/></td>
-		<td> Or  Select Image:</td>
-		<td> <input type="file"   id="document_attachment_doc" name="file" accept="image/*"/></td>
-		</tr>
-		<tr class = "manual" >
-		<td>Name of the item:</td>
-		<td><input type="text" name="title" maxlength="50"/></td>
-		</tr>
-		
-		<tr>
-		<td><input type="hidden" name ="listID" th:value= "${modelAndView.model.listID}"/></td>
-		</table>
+	<div class= "header">
+		<a href="/">
+			<img src="images/mainlogo.png" alt="Wishes" id="mainlogo"/>	</a>
+		<form name="logout" method="post" action="logout">
+ 	 		<label class="logoutLblPos">
+ 	 			<input type="image"  name="logout"  value="log out" src="images/logout.png">
+ 	 		</label>
 		</form>
-		</div>
-		<div class="images" >
-		<!-- <img th:src = "@{${'/photos/' + Contentimages.link}" alt = ""/>-->
-		
-		 <div th:each="Content : ${contentImages}">
-        	
-        	
-        	<div class="image-area">
-        	<a th:href="${Content.value.link}" target="_blank">
-        	<img th:src = "@{${'/img/' +Content.value.img_id}}" alt = "images/itemplaceholder.png" /> 
-        	<label class="title" th:text="${Content.value.title}">Title</label></a>
-        	<a class="remove-image" th:href="@{${'/deleteimg?img_id=' + Content.value.img_id+'&listID=' +modelAndView.model.listID}}" style="display: inline;">&#215;</a>
-			
+	</div>
+	<h1 th:text="${modelAndView.model.listtitle}" style="text-align: center;">ListTitle</h1>
+	<div class="box">
+		<form name=contsubmit action="newItem" method='POST' enctype="multipart/form-data" onsubmit="chgAction()">
+			<div class="inputBox">
+				<input type="url" name="link" required onkeyup="this.setAttribute('value', this.value);" value=""> 
+				<label>Link to you item:*</label>
 			</div>
-        	
-        	
-        	
-       </div>
-   
-		</div>
+	
 		
-		<!-- <table>
-       		<tr th:each="anews : ${Content.value}">
-       		<tr th:each="nkey : ${anews.key}">
-       		<td> <img th:src = "@{${'/photos/' + nkey.imgPath}" alt = ""/></td>
-       		  </tr> -->
-		
-		
-		
- 	 
- 	 
- 	 
- 	 
- 	 
- 	 
- 	 
- 	 
- 	 
- 	 
- 	 
+			<div class="inputBox">
+				<input 	type="text" name="title" maxlength="50" onkeyup="this.setAttribute('value', this.value);" value="">
+				<label>Title:</label>
+			</div>
+			
+			<div class="rad" style="display: inline-block;">
+			<input type="radio" onchange="hideForAuto()" name="autoormanual" checked> <label style="color: white">Automatic </label>
+			<input type="radio" onchange="showForManual()" name="autoormanual" checked><label style="color: white">Manual </label>
+			</div>
+			<div style="display: inline-block;">
+			<input name="submit" type="submit" value="submit"> 
+			</div>
+			<div class = "manual inputBox" >
+				<input type="url" name="imgpath" onkeyup="this.setAttribute('value', this.value);" value="">
+				<label>Link to a image of the item:</label>
+			</div>
+			
+			<div class="manual inputBox">
+				<input type="file"   id="document_attachment_doc" name="file" accept="image/*"/>
+				<label> Or  Select Image:</label>
+			</div>
+			<input type="hidden" name ="listID" th:value= "${modelAndView.model.listID}"/>
+		</form>
+	</div>
+	<div class="images" >
+		<!-- <img th:src = "@{${'/photos/' + Contentimages.link}" alt = ""/>-->
+		<div th:each="Content : ${contentImages}">
+        	<div class="image-area">
+        		<a th:href="${Content.value.link}" target="_blank">
+        			<img th:src = "@{${'/img/' +Content.value.img_id}}" onerror="this.src='/photos/listplaceholder.png';" /> 
+        			<label class="title" th:text="${Content.value.title}">Title</label></a>
+        		<a class="remove-image" th:href="@{${'/deleteimg?img_id=' + Content.value.img_id+'&listID=' +modelAndView.model.listID}}" style="display: inline;">&#215;</a>
+			</div>
+       	</div>
+   	</div>
 </body>
 </html>

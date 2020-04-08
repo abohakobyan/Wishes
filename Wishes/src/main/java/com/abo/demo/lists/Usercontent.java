@@ -11,7 +11,7 @@ public class Usercontent {
 	private String Cid;
 	private String listtitle;
 	private int uid;
-	
+	private boolean priv;
 	
 	public String getCid() {
 		return Cid;
@@ -30,5 +30,11 @@ public class Usercontent {
 	}
 	public void setListtitle(String listtitle) {
 		this.listtitle = listtitle;
+	}
+	public boolean isPriv() {
+		return priv;
+	}
+	public void setPriv(boolean priv) {
+		this.priv = priv;
 	}
 	}

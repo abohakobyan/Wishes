@@ -6,6 +6,8 @@
 <title>Your Lists</title>
 <link rel="stylesheet" type="text/css" href="CSS/home.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="images/mainlogo.png" >
+
 <script>
 
 </script>
@@ -23,27 +25,32 @@
 
 </div>
  	
- 	 <h1>Your Lists</h1>
+ 	 <h1 style="text-align: center;">Your Lists</h1>
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 
 	<div class="box">
 	
 	<form action="newlist" method='POST' >
-		<table>
-		<tr>
-		<td>Create New List:</td>
-		<td><input type="text" name="listName" maxlength="30"> <br></td>
 		
-		<td><input name="submit" type="submit" value="submit"> <br></td>
-		</tr>
-		</table>
+		<div class="inputBox">
+		<input type="text" name="listName" maxlength="30" required onkeyup="this.setAttribute('value', this.value);" value=""> 
+		<label>Create New List:</label>
+		</div>
+		<div class="rad" style="display: inline-block;">
+			<input type="radio" name="privateorpublic" value="true" checked> <label style="color: white">Private </label>
+			<input type="radio" name="privateorpublic" value="false" > <label style="color: white">Public </label>
+			</div>
+			<div style="display: inline-block;">
+		<input name="submit" type="submit" value="submit">
+		</div>
+		
 		</form>
 		</div>
 		<div class="images">
 		 <div th:each="Content : ${contentLists}" >
         	
         	<div class="image-area">
-        	<a th:href="@{${'/list?Cid=' + Content.key}}" >
+        	<a th:href="@{'/list'(Cid=${Content.key},listtitle=${Content.value.listtitle})}" >
         	<img th:src = "@{${'/photos/listplaceholder.png'}}" alt = "Image Did not Load Try Again Later"/>
         	<label class="title" th:text= "${Content.value.listtitle}">Title</label></a>
         	
