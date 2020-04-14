@@ -10,7 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +31,9 @@ public class AppSecure extends WebSecurityConfigurerAdapter
 		return provider;
 		
 	}
-
+		
+	@Autowired
+	UserRepository userrepo;
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -55,7 +61,10 @@ public class AppSecure extends WebSecurityConfigurerAdapter
 		.failureUrl("/login-error.html")
 		.defaultSuccessUrl("/home", true)
 		.and()
-		.oauth2Login().loginPage("/login").and()
+		.oauth2Login()
+		.authorizationEndpoint()
+		.and()
+		.defaultSuccessUrl("/home", true).loginPage("/login").and()
 		.logout().invalidateHttpSession(true)
 		.clearAuthentication(true)
 		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))

@@ -39,7 +39,7 @@ public class UserPrinciple implements UserDetails {
 		// TODO Auto-generated method stub
 		return user.getUsername();
 	}
-	public int getID() {
+	public String getID() {
 		return user.getId();
 	}
 

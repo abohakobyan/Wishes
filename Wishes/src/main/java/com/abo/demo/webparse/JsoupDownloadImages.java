@@ -92,7 +92,7 @@ public class JsoupDownloadImages  {
 	        if(document.title().length()>50)
 	        	res.add(document.title().substring(0, 50));
 	        else
-	        	res.add(document.title());}
+	        	res.add(document.title());
 	        /*activate in case server is overwhelmed changing the bottom if statement to 10 or more */
 	        Elements imageElements = document.getElementsByTag("img");
 	        for(Element imageElement : imageElements){
@@ -103,7 +103,7 @@ public class JsoupDownloadImages  {
 	            //download image one by one
 	            if(!strImageURL.isEmpty())
 	            res.add(strImageURL);
-	           
+	        }
 	            
 	        }
 	        if(res.size()<10) {

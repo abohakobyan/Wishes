@@ -12,9 +12,13 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -54,7 +58,7 @@ public class HomeController implements WebMvcConfigurer {
 	ImagesRepo imgrepo;
 	@Autowired
 	JsoupDownloadImages jsDownload;
-	
+		
 
 		@RequestMapping(value = "/id", method = RequestMethod.GET)
 	    @ResponseBody
@@ -65,12 +69,32 @@ public class HomeController implements WebMvcConfigurer {
 		public String index() {
 			return "index.html";
 		}
+		public String gettingID() {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			UserPrinciple p = null;
+			OAuth2AuthenticationToken oauthToken;
+			String uid = null;
+			if(authentication.getPrincipal() instanceof UserPrinciple) {
+				 p = (UserPrinciple) authentication.getPrincipal();
+				 uid= p.getID();
+			
+			}else {
+				oauthToken =(OAuth2AuthenticationToken) authentication;
+				uid = oauthToken.getPrincipal().getAttribute("sub");
+			}
+			return uid;
+		}
+		
+		
 		@RequestMapping("/home")
 		public ModelAndView home() {
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			UserPrinciple p = (UserPrinciple) authentication.getPrincipal();
-			int uid= p.getID();
+			String uid = this.gettingID();
+			
 			List<Usercontent> lists = contrepo.findByUid(uid);
+			
+			
+			
+		
 			Map<String, Usercontent> modelLists = new HashMap<String,Usercontent>();
 			for (Usercontent i : lists) modelLists.put(String.valueOf(i.getCid()),i);
 			ModelAndView usC = new ModelAndView();
@@ -122,10 +146,8 @@ public class HomeController implements WebMvcConfigurer {
 		@PostMapping("/newlist")
 		public String submitLink(@ModelAttribute("listName") String listName, @ModelAttribute("privateorpublic") String priv) {
 			
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			UserPrinciple p = (UserPrinciple) authentication.getPrincipal();
 			
-			int uid= p.getID();
+			String uid = this.gettingID();
 			Usercontent cont = new Usercontent();
 			if(priv.equals("false")) cont.setPriv(false);
 			else cont.setPriv(true);
@@ -140,11 +162,10 @@ public class HomeController implements WebMvcConfigurer {
 		//Populates the list page based on listID
 		@GetMapping("/list")
 		public ModelAndView list(ModelAndView modelAndView,@ModelAttribute("Cid") String listID, @ModelAttribute("listtitle") String listtitle) {
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			UserPrinciple p = (UserPrinciple) authentication.getPrincipal();
-			int uid= p.getID();
+		
+			String uid= this.gettingID();
 			Optional<Usercontent> valList = contrepo.findById(listID);
-			if(valList.get().getUid() == uid || !valList.get().isPriv()) {
+			if(valList.get().getUid().equals(uid) || !valList.get().isPriv()) {
 			List<Contentimages> imgs = imgrepo.findByCid(listID);
 			
 			

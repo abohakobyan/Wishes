@@ -10,7 +10,7 @@ public class Usercontent {
 	@Id
 	private String Cid;
 	private String listtitle;
-	private int uid;
+	private String uid;
 	private boolean priv;
 	
 	public String getCid() {
@@ -19,10 +19,10 @@ public class Usercontent {
 	public void setCid(String cid) {
 		Cid = cid;
 	}
-	public int getUid() {
+	public String getUid() {
 		return uid;
 	}
-	public void setUid(int uuid) {
+	public void setUid(String uuid) {
 		uid = uuid;
 	}
 	public String getListtitle() {
