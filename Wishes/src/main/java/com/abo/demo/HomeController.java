@@ -61,9 +61,11 @@ public class HomeController implements WebMvcConfigurer {
 	    public String currentUserName(Authentication authentication) {
 	        return authentication.getName();
 	    }
-	
-	
 		@RequestMapping("/")
+		public String index() {
+			return "index.html";
+		}
+		@RequestMapping("/home")
 		public ModelAndView home() {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			UserPrinciple p = (UserPrinciple) authentication.getPrincipal();
@@ -132,7 +134,7 @@ public class HomeController implements WebMvcConfigurer {
 			cont.setListtitle(listName);
 			cont.setCid(uniqueID);
 			contrepo.save(cont);
-			return "redirect:/";
+			return "redirect:/home";
 		}
 		
 		//Populates the list page based on listID
@@ -155,7 +157,7 @@ public class HomeController implements WebMvcConfigurer {
 			modelAndView.addObject("listID", listID);
 			return modelAndView;
 			}
-			modelAndView.setViewName("redirect:/");
+			modelAndView.setViewName("redirect:/home");
 			return modelAndView;
 		}
 		//Upload form 
@@ -231,7 +233,7 @@ public class HomeController implements WebMvcConfigurer {
 		public String removeList(@ModelAttribute("listID") String listID) {
 			imgrepo.deleteByCid(listID);
 			contrepo.deleteById(listID);
-			return "redirect:/";
+			return "redirect:/home";
 		}
 		
 		@GetMapping("/img/{id}")

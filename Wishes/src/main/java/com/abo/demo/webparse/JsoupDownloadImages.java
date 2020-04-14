@@ -88,24 +88,25 @@ public class JsoupDownloadImages  {
 
 //	        ArrayList<String> imgLinks= new ArrayList<String>();
 //	        //iterate over each image
+	        if(document!=null) {
 	        if(document.title().length()>50)
 	        	res.add(document.title().substring(0, 50));
 	        else
-	        	res.add(document.title());
+	        	res.add(document.title());}
 	        /*activate in case server is overwhelmed changing the bottom if statement to 10 or more */
-//	        Elements imageElements = document.getElementsByTag("img");
-//	        for(Element imageElement : imageElements){
-//	            
-//	            //make sure to get the absolute URL using abs: prefix
-//	            String strImageURL = imageElement.attr("abs:src");
-//	            
-//	            //download image one by one
-//	            if(!strImageURL.isEmpty())
-//	            res.add(strImageURL);
-//	           
-//	            
-//	        }
-	        if(res.size()<1000) {
+	        Elements imageElements = document.getElementsByTag("img");
+	        for(Element imageElement : imageElements){
+	            
+	            //make sure to get the absolute URL using abs: prefix
+	            String strImageURL = imageElement.attr("abs:src");
+	            
+	            //download image one by one
+	            if(!strImageURL.isEmpty())
+	            res.add(strImageURL);
+	           
+	            
+	        }
+	        if(res.size()<10) {
 	        Process proc = Runtime.getRuntime().exec("java -jar com.abo.urlh-0.0.1-SNAPSHOT.jar " + "\"" +link + "\"");
 		       //Process proc = Runtime.getRuntime().exec(new String[] { "bash", "-c", "echo hello > hello.txt" });
 		        InputStream in = proc.getInputStream();
