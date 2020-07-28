@@ -1,0 +1,1 @@
+https://wishes.buzz/
